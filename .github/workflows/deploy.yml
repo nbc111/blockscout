@@ -22,6 +22,13 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: 22
         script: |
+          # 检查并创建项目目录
+          if [ ! -d "/opt/blockscout" ]; then
+            echo "项目目录不存在，正在克隆..."
+            cd /opt
+            git clone https://github.com/nbc111/blockscout.git
+          fi
+          
           cd /opt/blockscout
           git pull origin main
           
