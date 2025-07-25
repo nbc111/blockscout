@@ -1,0 +1,51 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: 22
+        script: |
+          cd /opt/blockscout
+          git pull origin main
+          
+          # 检查端口占用
+          chmod +x scripts/check-ports.sh
+          ./scripts/check-ports.sh
+          
+          # 配置防火墙
+          ufw allow 4000 2>/dev/null || true
+          ufw allow 4001 2>/dev/null || true
+          ufw allow 4002 2>/dev/null || true
+          
+          # 部署服务
+          cd docker-compose
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
+          docker system prune -f
+          
+          # 检查服务状态
+          sleep 10
+          docker-compose ps
+          
+          echo "部署完成！访问地址："
+          echo "主服务: http://206.238.197.207:4000"
+          echo "统计服务: http://206.238.197.207:4001"
+          echo "可视化服务: http://206.238.197.207:4002" 
