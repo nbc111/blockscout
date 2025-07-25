@@ -22,27 +22,41 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: 22
         script: |
+          echo "=== 开始部署 Blockscout ==="
+          
           # 检查并创建项目目录
           if [ ! -d "/opt/blockscout" ]; then
             echo "项目目录不存在，正在克隆..."
             cd /opt
             git clone https://github.com/nbc111/blockscout.git
+          else
+            echo "项目目录已存在"
           fi
           
           cd /opt/blockscout
+          echo "当前目录: $(pwd)"
           git pull origin main
           
           # 检查端口占用
+          echo "检查端口占用..."
           chmod +x scripts/check-ports.sh
           ./scripts/check-ports.sh
           
           # 配置防火墙
+          echo "配置防火墙..."
           ufw allow 4000 2>/dev/null || true
           ufw allow 4001 2>/dev/null || true
           ufw allow 4002 2>/dev/null || true
           
+          # 检查Docker
+          echo "检查Docker服务..."
+          docker --version
+          docker-compose --version
+          
           # 部署服务
+          echo "开始部署服务..."
           cd docker-compose
+          echo "进入docker-compose目录: $(pwd)"
           docker-compose down
           docker-compose pull
           docker-compose up -d
