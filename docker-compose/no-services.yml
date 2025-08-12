@@ -38,10 +38,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
-        ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:8545/
-        ETHEREUM_JSONRPC_WS_URL: ws://host.docker.internal:8545/
-        CHAIN_ID: '1337'
+        ETHEREUM_JSONRPC_HTTP_URL: https://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL
+        ETHEREUM_JSONRPC_TRACE_URL: https://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL
+        ETHEREUM_JSONRPC_WS_URL: wss://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL
+        CHAIN_ID: '1'
 
   frontend:
     depends_on:
