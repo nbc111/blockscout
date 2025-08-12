@@ -29,13 +29,11 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_VARIANT: 'geth'
-        ETHEREUM_JSONRPC_HTTP_URL: 'https://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL'
-        ETHEREUM_JSONRPC_WS_URL: 'wss://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL'
-        ETHEREUM_JSONRPC_TRACE_URL: 'https://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL'
+        ETHEREUM_JSONRPC_VARIANT: 'anvil'
+        ETHEREUM_JSONRPC_WS_URL: ws://host.docker.internal:8545/
         INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: 'true'
         INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: 'true'
-        CHAIN_ID: '1'
+        CHAIN_ID: '1337'
 
   visualizer:
     extends:
@@ -54,8 +52,8 @@ services:
       file: ./services/frontend.yml
       service: frontend
     environment:
-      NEXT_PUBLIC_NETWORK_ID: '1'
-      NEXT_PUBLIC_NETWORK_RPC_URL: 'https://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL'
+      NEXT_PUBLIC_NETWORK_ID: '1337'
+      NEXT_PUBLIC_NETWORK_RPC_URL: http://host.docker.internal:8545/
 
   stats-db-init:
     extends:
