@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL
-        ETHEREUM_JSONRPC_TRACE_URL: https://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL
-        ETHEREUM_JSONRPC_WS_URL: wss://eth-mainnet.g.alchemy.com/v2/9gK8ab-Gmj_9xCbC_YaTL
+        ETHEREUM_JSONRPC_HTTP_URL: http://206.238.196.207:9944
+        ETHEREUM_JSONRPC_TRACE_URL: http://206.238.196.207:9944
+        ETHEREUM_JSONRPC_WS_URL: ws://206.238.196.207:9944
         CHAIN_ID: '1'
 
   nft_media_handler:
