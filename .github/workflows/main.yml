@@ -30,20 +30,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
             cd ${{ secrets.BLOCKSCOUT_DIR }} &&
-            TIMESTAMP=\$(date +%Y%m%d%H%M%S) &&
             # 关键：指定 docker-compose 子文件夹中的配置文件
             docker-compose -f ./docker-compose/docker-compose.yml down &&
-            cp -r ./docker-compose ./backups/full_backup_\$TIMESTAMP/ &&
-            echo 'Server backup created: full_backup_\$TIMESTAMP'
-          "
-      
-      - name: Rebuild and start containers
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
-            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
-            # 关键：指定配置文件路径
-            docker-compose -f ./docker-compose/docker-compose.yml up -d --build &&
-            echo 'Containers rebuilt and started'
+            echo 'STOP DOCKER COMPOSE'
           "
       
       - name: Run database migrations
@@ -53,20 +42,4 @@ jobs:
             # 关键：指定配置文件路径
             docker-compose -f ./docker-compose/docker-compose.yml up -d --build &&
             echo 'completed success'
-          "
-      
-      - name: Rollback on failure
-        if: steps.health-check.outcome == 'failure'
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
-            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
-            echo 'Deployment failed, initiating rollback...' &&
-            # 关键：指定配置文件路径
-            docker-compose -f ./docker-compose/docker-compose.yml down &&
-            LATEST_BACKUP=\$(ls -td ./backups/full_backup_* | head -1) &&
-            rm -rf ./docker-compose/* &&
-            cp -r \$LATEST_BACKUP/* . &&
-            # 关键：指定配置文件路径
-            docker-compose -f ./docker-compose/docker-compose.yml up -d &&
-            echo 'Rollback completed'
           "
