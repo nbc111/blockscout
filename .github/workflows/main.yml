@@ -64,7 +64,7 @@ jobs:
             # 关键：指定配置文件路径
             docker-compose -f ./docker-compose/docker-compose.yml down &&
             LATEST_BACKUP=\$(ls -td ./backups/full_backup_* | head -1) &&
-            rm -rf ./* &&
+            rm -rf ./docker-compose/* &&
             cp -r \$LATEST_BACKUP/* . &&
             # 关键：指定配置文件路径
             docker-compose -f ./docker-compose/docker-compose.yml up -d &&
