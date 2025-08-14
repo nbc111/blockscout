@@ -34,10 +34,13 @@ services:
     links:
       - db:database
     environment:
-      ETHEREUM_JSONRPC_HTTP_URL: http://206.238.196.207:9944
-      ETHEREUM_JSONRPC_TRACE_URL: http://206.238.196.207:9944
-      ETHEREUM_JSONRPC_WS_URL: ws://206.238.196.207:9944
-      CHAIN_ID: '1'
+        ETHEREUM_JSONRPC_HTTP_URL: http://206.238.196.207:9944
+        ETHEREUM_JSONRPC_TRACE_URL: http://206.238.196.207:9944
+        ETHEREUM_JSONRPC_WS_URL: ws://206.238.196.207:9944
+        ECTO_USE_SSL: 'false'
+        CHAIN_ID: '1'
+        API_V2_ENABLED: 'true'
+        MIX_ENV: 'prod'
 
   nft_media_handler:
     depends_on:
