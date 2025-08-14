@@ -33,7 +33,7 @@ jobs:
             TIMESTAMP=\$(date +%Y%m%d%H%M%S) &&
             # 关键：指定 docker-compose 子文件夹中的配置文件
             docker-compose -f ./docker-compose/docker-compose.yml down &&
-            cp -r . ./backups/full_backup_\$TIMESTAMP/ &&
+            cp -r ./docker-compse ./backups/full_backup_\$TIMESTAMP/ &&
             echo 'Server backup created: full_backup_\$TIMESTAMP'
           "
       
