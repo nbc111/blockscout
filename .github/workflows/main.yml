@@ -26,13 +26,17 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful'"
 
-      - name: Backup current state on server
+      - name: Stop containers and pull latest code
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
             cd ${{ secrets.BLOCKSCOUT_DIR }} &&
-            # 关键：指定 docker-compose 子文件夹中的配置文件
+            # 停止当前运行的容器
             docker-compose -f ./docker-compose/docker-compose.yml down &&
-            echo 'STOP DOCKER COMPOSE'
+            echo 'STOPPED DOCKER COMPOSE' &&
+            # 拉取最新代码
+            git pull &&
+            echo 'PULLED LATEST CODE'
+          "cho 'STOP DOCKER COMPOSE'
           "
       
       - name: Run database migrations
