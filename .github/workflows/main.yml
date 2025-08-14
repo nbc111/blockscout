@@ -40,6 +40,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
             cd ${{ secrets.BLOCKSCOUT_DIR }} &&
             # 关键：指定配置文件路径
-            docker-compose -f ./docker-compose/docker-compose.yml up -d --build &&
+            FRONT_PROXY_PASS=http://host.docker.internal:3000  docker-compose -f ./docker-compose/docker-compose.yml up -d  &&
             echo 'completed success'
           "
