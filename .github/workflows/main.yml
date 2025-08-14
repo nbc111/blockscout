@@ -31,10 +31,10 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
             cd ${{ secrets.BLOCKSCOUT_DIR }} &&
             # 停止当前运行的容器
-            docker-compose -f ./docker-compose/docker-compose.yml down &&
+            git pull && docker-compose -f ./docker-compose/docker-compose.yml down &&
             echo 'STOPPED DOCKER COMPOSE' &&
             # 拉取最新代码
-            git pull &&
+          
             echo 'PULLED LATEST CODE'
           "
       
