@@ -8,6 +8,7 @@ RUN apk --no-cache --update add \
 # Cache elixir deps
 COPY mix.exs mix.lock ./
 COPY apps/block_scout_web/mix.exs ./apps/block_scout_web/
+COPY apps/block_scout_web/lib/block_sout_web ./apps/block_scout_web/lib/block_scout_web/
 COPY apps/explorer/mix.exs ./apps/explorer/
 COPY apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
 COPY apps/indexer/mix.exs ./apps/indexer/
