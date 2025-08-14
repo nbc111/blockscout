@@ -37,18 +37,6 @@ jobs:
             echo 'Server backup created: full_backup_\$TIMESTAMP'
           "
       
-      - name: Build frontend assets on server
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
-            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
-            # 关键：通过 -f 指定配置文件路径
-            docker-compose -f ./docker-compose/docker-compose.yml run --rm frontend-build bash -c '
-              npm install &&
-              npm run build &&
-              echo 'Frontend build completed'
-            '
-          "
-      
       - name: Rebuild and start containers
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
