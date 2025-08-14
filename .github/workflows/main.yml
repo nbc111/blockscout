@@ -1,0 +1,117 @@
+name: Update Blockscout (Current Repository)
+
+on:
+  workflow_dispatch:  # 手动触发
+  push:
+    branches: [ main, master ]  # 当推送到主分支时自动触发
+
+jobs:
+  update-blockscout:
+    name: Update Blockscout from Current Repo
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout current repository code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 拉取完整历史，确保能获取所有分支信息
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Test SSH connection
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful'"
+
+      - name: Backup current state on server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
+            TIMESTAMP=\$(date +%Y%m%d%H%M%S) &&
+            docker-compose down &&
+            cp -r . ./backups/full_backup_\$TIMESTAMP/ &&
+            echo 'Server backup created: full_backup_\$TIMESTAMP'
+          "
+
+      - name: Sync latest code to server
+        run: |
+          # 将本地 checkout 的最新代码同步到服务器
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='docker-compose.override.yml' \
+            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.BLOCKSCOUT_DIR }}/
+          echo "Code synchronized to server"
+
+      - name: Build frontend assets on server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
+            docker-compose run --rm frontend-build bash -c '
+              npm install &&
+              npm run build &&
+              echo 'Frontend build completed'
+            '
+          "
+
+      - name: Pull dependent images
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
+            docker pull postgres:14-alpine &&
+            docker pull redis:alpine
+          "
+
+      - name: Rebuild and start containers
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
+            docker-compose up -d --build &&
+            echo 'Containers rebuilt and started'
+          "
+
+      - name: Run database migrations
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
+            docker-compose exec -T web mix ecto.migrate &&
+            echo 'Database migrations completed'
+          "
+
+      - name: Check service health
+        id: health-check
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            sleep 60 &&
+            if docker ps --filter 'name=blockscout_web' --format '{{.Status}}' | grep -q 'Up'; then
+              if curl -s --head ${{ secrets.BLOCKSCOUT_URL }} | grep -q '200 OK'; then
+                echo 'Blockscout is running successfully'
+                exit 0
+              else
+                echo 'Blockscout container is up but not responding'
+                exit 1
+              fi
+            else
+              echo 'Blockscout container is not running'
+              exit 1
+            fi
+          "
+
+      - name: Rollback on failure
+        if: steps.health-check.outcome == 'failure'
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.BLOCKSCOUT_DIR }} &&
+            echo 'Deployment failed, initiating rollback...' &&
+            docker-compose down &&
+            LATEST_BACKUP=\$(ls -td ./backups/full_backup_* | head -1) &&
+            rm -rf ./* &&
+            cp -r \$LATEST_BACKUP/* . &&
+            docker-compose up -d &&
+            echo 'Rollback completed'
+          "
+    
