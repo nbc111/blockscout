@@ -34,10 +34,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://206.238.196.207:9944
-        ETHEREUM_JSONRPC_TRACE_URL: http://206.238.196.207:9944
-        ETHEREUM_JSONRPC_WS_URL: ws://206.238.196.207:9944
-        CHAIN_ID: '1'
+      ETHEREUM_JSONRPC_HTTP_URL: http://206.238.196.207:9944
+      ETHEREUM_JSONRPC_TRACE_URL: http://206.238.196.207:9944
+      ETHEREUM_JSONRPC_WS_URL: ws://206.238.196.207:9944
+      CHAIN_ID: '1'
 
   nft_media_handler:
     depends_on:
@@ -61,12 +61,6 @@ services:
       file: ./services/sig-provider.yml
       service: sig-provider
 
-  frontend:
-    depends_on:
-      - backend
-    extends:
-      file: ./services/frontend.yml
-      service: frontend
 
   stats-db-init:
     extends:
@@ -100,7 +94,6 @@ services:
   proxy:
     depends_on:
       - backend
-      - frontend
       - stats
     extends:
       file: ./services/nginx.yml
