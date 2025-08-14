@@ -36,7 +36,6 @@ jobs:
             # 拉取最新代码
             git pull &&
             echo 'PULLED LATEST CODE'
-          "cho 'STOP DOCKER COMPOSE'
           "
       
       - name: Run database migrations
