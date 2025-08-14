@@ -51,8 +51,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
             cd ${{ secrets.BLOCKSCOUT_DIR }} &&
             # 关键：指定配置文件路径
-            docker-compose -f ./docker-compose/docker-compose.yml exec -T web mix ecto.migrate &&
-            echo 'Database migrations completed'
+            docker-compose -f ./docker-compose/docker-compose.yml up -d --build &&
+            echo 'completed success'
           "
       
       - name: Rollback on failure
