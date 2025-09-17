@@ -30,10 +30,10 @@ services:
       - db:database
     environment:
         ETHEREUM_JSONRPC_VARIANT: 'geth'
-        ETHEREUM_JSONRPC_WS_URL: ws://206.238.196.207:9944
+        ETHEREUM_JSONRPC_WS_URL: wss://rpc.nbcex.com
         INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: 'false'
         INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: 'false'
-        CHAIN_ID: '1'
+        CHAIN_ID: '1281'
 
   visualizer:
     extends:
@@ -52,8 +52,8 @@ services:
       file: ./services/frontend.yml
       service: frontend
     environment:
-      NEXT_PUBLIC_NETWORK_ID: '1'
-      NEXT_PUBLIC_NETWORK_RPC_URL: http://206.238.196.207:9944
+      NEXT_PUBLIC_NETWORK_ID: '1281'
+      NEXT_PUBLIC_NETWORK_RPC_URL: https://rpc.nbcex.com
 
   stats-db-init:
     extends:
