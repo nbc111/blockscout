@@ -41,7 +41,7 @@ services:
         ETHEREUM_JSONRPC_HTTP_URL: https://rpc.nbcex.com
         ETHEREUM_JSONRPC_TRACE_URL: https://rpc.nbcex.com
         ETHEREUM_JSONRPC_WS_URL: wss://rpc.nbcex.com
-        CHAIN_ID: '1281'
+        CHAIN_ID: '1'
 
   frontend:
     depends_on:

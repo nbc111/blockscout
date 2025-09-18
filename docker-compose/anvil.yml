@@ -33,7 +33,7 @@ services:
         ETHEREUM_JSONRPC_WS_URL: wss://rpc.nbcex.com
         INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: 'false'
         INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: 'false'
-        CHAIN_ID: '1281'
+        CHAIN_ID: '1'
 
   visualizer:
     extends:
