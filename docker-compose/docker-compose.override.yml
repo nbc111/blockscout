@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: ../../frontend      # 指向自定义 frontend 目录
+      dockerfile: Dockerfile       # 如果 frontend 里有 Dockerfile
+    container_name: 'frontend'
+    ports:
+      - "3000:3000"                # 映射端口
+    environment:
+      - NEXT_PUBLIC_API_HOST=http://backend:4000/api/v1
+      - NEXT_PUBLIC_API_PROTOCOL=http
+      - NEXT_PUBLIC_APP_HOST=localhost
+      - NEXT_PUBLIC_APP_PROTOCOL=http
+    command: sh -c "yarn build && yarn start"
