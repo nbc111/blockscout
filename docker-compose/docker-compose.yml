@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.nbcex.com
-        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.nbcex.com
-        ETHEREUM_JSONRPC_WS_URL: wss://rpc.nbcex.com
+        ETHEREUM_JSONRPC_HTTP_URL: http://156.251.17.96:9944
+        ETHEREUM_JSONRPC_TRACE_URL: http://156.251.17.96:9944
+        ETHEREUM_JSONRPC_WS_URL: ws://156.251.17.96:9944
         CHAIN_ID: '1281'
         API_V2_ENABLED: 'true'
 

@@ -30,7 +30,7 @@ services:
       - db:database
     environment:
         ETHEREUM_JSONRPC_VARIANT: 'geth'
-        ETHEREUM_JSONRPC_WS_URL: wss://rpc.nbcex.com
+        ETHEREUM_JSONRPC_WS_URL: ws://156.251.17.96:9944
         INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: 'false'
         INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: 'false'
         CHAIN_ID: '1281'
@@ -53,7 +53,7 @@ services:
       service: frontend
     environment:
       NEXT_PUBLIC_NETWORK_ID: '1281'
-      NEXT_PUBLIC_NETWORK_RPC_URL: https://rpc.nbcex.com
+      NEXT_PUBLIC_NETWORK_RPC_URL: http://156.251.17.96:9944
 
   stats-db-init:
     extends:
