@@ -29,4 +29,4 @@
 - [ ] I checked whether I should update the docs and did so by submitting a PR to [docs repository](https://github.com/blockscout/docs).
 - [ ] If I added/changed/removed ENV var, I submitted a PR to [docs repository](https://github.com/blockscout/docs) to update the list of [env vars](https://github.com/blockscout/docs/blob/master/setup/env-variables/README.md) and I updated the version to `master` in the Version column. If I removed variable, I added it to [Deprecated ENV Variables](https://github.com/blockscout/docs/blob/master/setup/env-variables/deprecated-env-variables/README.md) page. After merging docs PR, changes will be reflected in these [pages](https://docs.blockscout.com/setup/env-variables).
 - [ ] If I added new DB indices, I checked, that they are not redundant, with PGHero or other tools.
-- [ ] If I added/removed chain type, I modified the Github CI matrix and PR labels accordingly.
+- [ ] If I added/removed chain type, I modified the Github CI matrix and PR labels accordingly..
