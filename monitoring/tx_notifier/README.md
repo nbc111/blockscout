@@ -41,6 +41,8 @@ python tx_notifier.py
 | `TX_NOTIFIER_WATCH_ADDRESSES` | 仅监控指定地址（逗号分隔，0x 开头）；为空表示全量 | 空 |
 | `TX_NOTIFIER_STATE_FILE` | 状态文件保存路径 | `tx_notifier.state.json` |
 | `TX_NOTIFIER_EXPLORER_URL` | 飞书消息中的交易链接前缀 | 未设置 |
+| `TX_NOTIFIER_COIN_SYMBOL` | 金额单位展示（如 `NBC`、`ETH`） | `NBC` |
+| `TX_NOTIFIER_TIMEZONE` | 通知中显示的时区，例如 `Asia/Shanghai` | `Asia/Shanghai` |
 | `TX_NOTIFIER_WEBHOOK_TIMEOUT` | 请求飞书的超时时间（秒） | `5` |
 | `TX_NOTIFIER_VERBOSE` | `true/false`，控制日志级别 | `false` |
 

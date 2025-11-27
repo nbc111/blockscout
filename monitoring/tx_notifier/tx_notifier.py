@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from decimal import Decimal, getcontext
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence, Tuple
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import psycopg2
 import psycopg2.extras
@@ -63,6 +64,9 @@ class Config:
     watch_addresses: Tuple[str, ...]
     explorer_url: Optional[str]
     verbose: bool
+    coin_symbol: str
+    timezone_name: str
+    timezone_obj: ZoneInfo
 
 
 def load_config() -> Config:
@@ -104,6 +108,12 @@ def load_config() -> Config:
         if addr.strip()
     )
 
+    timezone_name = os.getenv("TX_NOTIFIER_TIMEZONE", "Asia/Shanghai").strip() or "Asia/Shanghai"
+    try:
+        timezone_obj = ZoneInfo(timezone_name)
+    except ZoneInfoNotFoundError as exc:
+        raise SystemExit(f"无法加载时区 {timezone_name}: {exc}") from exc
+
     return Config(
         dsn=dsn,
         poll_interval=max(env_float("TX_NOTIFIER_POLL_INTERVAL", 5.0), 1.0),
@@ -115,6 +125,9 @@ def load_config() -> Config:
         watch_addresses=watch_addresses,
         explorer_url=os.getenv("TX_NOTIFIER_EXPLORER_URL"),
         verbose=env_bool("TX_NOTIFIER_VERBOSE", False),
+        coin_symbol=os.getenv("TX_NOTIFIER_COIN_SYMBOL", "NBC").strip() or "NBC",
+        timezone_name=timezone_name,
+        timezone_obj=timezone_obj,
     )
 
 
@@ -247,7 +260,13 @@ def build_message(tx: dict, cfg: Config) -> dict:
     from_addr = normalize_hex(tx["from_address"])
     to_addr = normalize_hex(tx["to_address"]) or "(contract creation)"
     created = normalize_hex(tx["contract_address"])
-    timestamp = tx["inserted_at"].astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts_local = tx["inserted_at"].astimezone(cfg.timezone_obj)
+    offset = ts_local.utcoffset() or timezone.utc.utcoffset(datetime.now(timezone.utc))
+    offset_hours = int(offset.total_seconds() // 3600)
+    offset_minutes = int((abs(offset.total_seconds()) % 3600) // 60)
+    offset_sign = "+" if offset_hours >= 0 else "-"
+    offset_str = f"UTC{offset_sign}{abs(offset_hours):02d}:{offset_minutes:02d}"
+    timestamp = ts_local.strftime(f\"%Y-%m-%d %H:%M:%S {cfg.timezone_name} ({offset_str})\")
     link = f"{cfg.explorer_url.rstrip('/')}/tx/{tx_hash}" if cfg.explorer_url else tx_hash
 
     lines = [
@@ -256,7 +275,7 @@ def build_message(tx: dict, cfg: Config) -> dict:
         f"Tx: {tx_hash}",
         f"From: {from_addr}",
         f"To: {to_addr}",
-        f"Value: {eth_text} ETH ({wei} wei)",
+        f"Value: {eth_text} {cfg.coin_symbol} ({wei} wei)",
         f"时间: {timestamp}",
         f"链接: {link}",
     ]
