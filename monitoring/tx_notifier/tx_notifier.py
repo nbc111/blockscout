@@ -261,12 +261,14 @@ def build_message(tx: dict, cfg: Config) -> dict:
     to_addr = normalize_hex(tx["to_address"]) or "(contract creation)"
     created = normalize_hex(tx["contract_address"])
     ts_local = tx["inserted_at"].astimezone(cfg.timezone_obj)
-    offset = ts_local.utcoffset() or timezone.utc.utcoffset(datetime.now(timezone.utc))
+    offset = ts_local.utcoffset()
+    if offset is None:
+        offset = timezone.utc.utcoffset(datetime.now(timezone.utc))
     offset_hours = int(offset.total_seconds() // 3600)
     offset_minutes = int((abs(offset.total_seconds()) % 3600) // 60)
     offset_sign = "+" if offset_hours >= 0 else "-"
     offset_str = f"UTC{offset_sign}{abs(offset_hours):02d}:{offset_minutes:02d}"
-    timestamp = ts_local.strftime(f\"%Y-%m-%d %H:%M:%S {cfg.timezone_name} ({offset_str})\")
+    timestamp = ts_local.strftime(f"%Y-%m-%d %H:%M:%S {cfg.timezone_name} ({offset_str})")
     link = f"{cfg.explorer_url.rstrip('/')}/tx/{tx_hash}" if cfg.explorer_url else tx_hash
 
     lines = [
