@@ -1,0 +1,15 @@
+[Unit]
+Description=Blockscout Transaction Notifier
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/www/blockscout/monitoring/tx_notifier
+EnvironmentFile=/www/blockscout/monitoring/tx_notifier/tx-notifier.env
+ExecStart=/www/blockscout/monitoring/tx_notifier/.venv/bin/python tx_notifier.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
