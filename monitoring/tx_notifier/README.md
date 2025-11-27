@@ -43,6 +43,7 @@ python tx_notifier.py
 | `TX_NOTIFIER_EXPLORER_URL` | 飞书消息中的交易链接前缀 | 未设置 |
 | `TX_NOTIFIER_COIN_SYMBOL` | 金额单位展示（如 `NBC`、`ETH`） | `NBC` |
 | `TX_NOTIFIER_TIMEZONE` | 通知中显示的时区，例如 `Asia/Shanghai` | `Asia/Shanghai` |
+| `TX_NOTIFIER_SKIP_COIN_TRANSFERS` | `true/false`，是否忽略纯原生币转账（input=0x） | `true` |
 | `TX_NOTIFIER_WEBHOOK_TIMEOUT` | 请求飞书的超时时间（秒） | `5` |
 | `TX_NOTIFIER_VERBOSE` | `true/false`，控制日志级别 | `false` |
 

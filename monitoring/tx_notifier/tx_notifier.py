@@ -67,6 +67,7 @@ class Config:
     coin_symbol: str
     timezone_name: str
     timezone_obj: ZoneInfo
+    skip_coin_transfers: bool
 
 
 def load_config() -> Config:
@@ -128,6 +129,7 @@ def load_config() -> Config:
         coin_symbol=os.getenv("TX_NOTIFIER_COIN_SYMBOL", "NBC").strip() or "NBC",
         timezone_name=timezone_name,
         timezone_obj=timezone_obj,
+        skip_coin_transfers=env_bool("TX_NOTIFIER_SKIP_COIN_TRANSFERS", True),
     )
 
 
@@ -212,6 +214,7 @@ def fetch_new_transactions(
             encode(t.from_address_hash, 'hex') AS from_address,
             encode(t.to_address_hash, 'hex') AS to_address,
             encode(t.created_contract_address_hash, 'hex') AS contract_address,
+            encode(t.input, 'hex') AS input_hex,
             t.block_number,
             t.nonce,
             t.value,
@@ -238,6 +241,9 @@ def format_value(value: Decimal) -> Tuple[int, str]:
 def should_notify(tx: dict, cfg: Config) -> bool:
     wei, _ = format_value(tx["value"])
     if wei < cfg.min_value_wei:
+        return False
+
+    if cfg.skip_coin_transfers and is_coin_transfer(tx):
         return False
 
     if not cfg.watch_addresses:
@@ -285,6 +291,17 @@ def build_message(tx: dict, cfg: Config) -> dict:
         lines.insert(5, f"新合约: {created}")
 
     return {"msg_type": "text", "content": {"text": "\n".join(lines)}}
+
+
+def is_coin_transfer(tx: dict) -> bool:
+    """判定是否为空输入的原生币转账"""
+    input_hex = tx.get("input_hex")
+    if not input_hex:
+        return True
+    normalized = input_hex.lower()
+    if not normalized.startswith("0x"):
+        normalized = "0x" + normalized
+    return normalized == "0x"
 
 
 def send_to_feishu(payload: dict, cfg: Config) -> None:
