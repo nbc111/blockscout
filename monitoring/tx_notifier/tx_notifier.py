@@ -68,6 +68,7 @@ class Config:
     timezone_name: str
     timezone_obj: ZoneInfo
     skip_coin_transfers: bool
+    min_coin_transfer_value_wei: int
 
 
 def load_config() -> Config:
@@ -115,6 +116,11 @@ def load_config() -> Config:
     except ZoneInfoNotFoundError as exc:
         raise SystemExit(f"无法加载时区 {timezone_name}: {exc}") from exc
 
+    # 100万NBC = 1000000 * 10^18 wei
+    min_coin_transfer_value_wei = env_int(
+        "TX_NOTIFIER_MIN_COIN_TRANSFER_VALUE_WEI", 1000000000000000000000000
+    )
+
     return Config(
         dsn=dsn,
         poll_interval=max(env_float("TX_NOTIFIER_POLL_INTERVAL", 5.0), 1.0),
@@ -130,6 +136,7 @@ def load_config() -> Config:
         timezone_name=timezone_name,
         timezone_obj=timezone_obj,
         skip_coin_transfers=env_bool("TX_NOTIFIER_SKIP_COIN_TRANSFERS", True),
+        min_coin_transfer_value_wei=max(min_coin_transfer_value_wei, 0),
     )
 
 
@@ -243,8 +250,14 @@ def should_notify(tx: dict, cfg: Config) -> bool:
     if wei < cfg.min_value_wei:
         return False
 
+    # 如果是原生币转账，但金额 >= 最小阈值，仍然发送通知
     if cfg.skip_coin_transfers and is_coin_transfer(tx):
-        return False
+        if wei >= cfg.min_coin_transfer_value_wei:
+            # 大额原生币转账仍然通知
+            pass
+        else:
+            # 小额原生币转账跳过
+            return False
 
     if not cfg.watch_addresses:
         return True
