@@ -15,18 +15,23 @@ export function updateAllAges ($container = $(document)) {
 function tryUpdateAge (el) {
   if (!el.dataset.fromNow) return
 
-  const timestamp = moment(el.dataset.fromNow)
+  // 修复：使用 moment.utc() 确保时间戳被解析为UTC时间
+  // 因为数据库存储的是 timestamp without time zone，应该按UTC处理
+  const timestamp = moment.utc(el.dataset.fromNow)
   if (timestamp.isValid()) updateAge(el, timestamp)
 }
 function updateAge (el, timestamp) {
+  // 计算相对时间（使用UTC时间）
   let fromNow = timestamp.fromNow()
   // show the exact time only for transaction details page. Otherwise, short entry
   const elInTile = el.hasAttribute('in-tile')
   if ((window.location.pathname.includes('/tx/') || window.location.pathname.includes('/block/') || window.location.pathname.includes('/blocks/')) && !elInTile) {
-    const offset = moment().utcOffset() / 60
-    const sign = offset && Math.sign(offset) ? '+' : '-'
-    const formatDate = `MMMM-DD-YYYY hh:mm:ss A ${sign}${offset} UTC`
-    fromNow = `${fromNow} | ${timestamp.format(formatDate)}`
+    // 修复：转换为本地时区并正确格式化
+    const localTime = timestamp.local()
+    const offsetStr = localTime.format('Z') // 自动获取时区偏移，如 +08:00
+    // 修复：使用正确的日期格式，使用方括号避免moment.js解析为时区指令
+    const formatDate = `MMMM DD YYYY hh:mm:ss A [UTC${offsetStr}]`
+    fromNow = `${fromNow} | ${localTime.format(formatDate)}`
   }
   if (fromNow !== el.innerHTML) el.innerHTML = fromNow
 }
