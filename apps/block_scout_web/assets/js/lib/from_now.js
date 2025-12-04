@@ -30,7 +30,8 @@ function updateAge (el, timestamp) {
     const localTime = timestamp.local()
     const offsetStr = localTime.format('Z') // 自动获取时区偏移，如 +08:00
     // 修复：使用正确的日期格式，使用方括号避免moment.js解析为时区指令
-    const formatDate = `MMMM DD YYYY hh:mm:ss A [UTC${offsetStr}]`
+    // 格式：Dec 04 2025 12:14:48 PM (UTC+08:00)
+    const formatDate = `MMM DD YYYY hh:mm:ss A [(UTC${offsetStr})]`
     fromNow = `${fromNow} | ${localTime.format(formatDate)}`
   }
   if (fromNow !== el.innerHTML) el.innerHTML = fromNow
