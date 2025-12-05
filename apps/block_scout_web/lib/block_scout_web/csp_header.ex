@@ -50,6 +50,33 @@ defmodule BlockScoutWeb.CSPHeader do
 
   defp websocket_endpoints(conn) do
     host = Conn.get_req_header(conn, "host")
-    "ws://#{host} wss://#{host}"
+    # 清理 host，移除任何无效的前缀
+    cleaned_host = 
+      host
+      |> List.first()
+      |> sanitize_host()
+    
+    if cleaned_host == "" do
+      ""
+    else
+      "ws://#{cleaned_host} wss://#{cleaned_host}"
+    end
   end
+  
+  # 清理和验证 host，移除无效的前缀
+  defp sanitize_host(nil), do: ""
+  
+  defp sanitize_host(host) when is_binary(host) do
+    host
+    |> String.trim()
+    |> String.replace(~r/^\*\./, "")  # 移除开头的 *. 前缀
+    |> String.replace(~r/^\*/, "")    # 移除开头的 * 前缀
+    |> String.replace(~r/^https?:\/\//, "")  # 移除 http:// 或 https:// 前缀
+    |> case do
+      "" -> ""
+      cleaned -> cleaned
+    end
+  end
+  
+  defp sanitize_host(_), do: ""
 end
