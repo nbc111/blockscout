@@ -2,6 +2,9 @@ version: '3.9'
 
 services:
   frontend:
+    build:
+      context: /www/blockscout-frontend-custom
+      dockerfile: Dockerfile
     image: blockscout-frontend:local
     platform: linux/amd64
     restart: always
