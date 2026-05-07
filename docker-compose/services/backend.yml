@@ -15,6 +15,12 @@ services:
     volumes:
       - ./logs/:/app/logs/
       - ./dets/:/app/dets/
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:4000/api/health/liveness >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
     logging:
       driver: "json-file"
       options:

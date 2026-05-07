@@ -84,8 +84,10 @@ services:
 
   stats:
     depends_on:
-      - stats-db
-      - backend
+      stats-db:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
     extends:
       file: ./services/stats.yml
       service: stats
