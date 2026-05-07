@@ -92,8 +92,10 @@ services:
 
   user-ops-indexer:
     depends_on:
-      - db
-      - backend
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
     extends:
       file: ./services/user-ops-indexer.yml
       service: user-ops-indexer
